@@ -3,16 +3,7 @@ module Mongoid
     extend ActiveSupport::Concern
 
     def self.included(base)
-      base.extend(ClassMethods)
       base.after_initialize :freeze_relation_ids
-    end
-
-    module ClassMethods
-      def init_sorted_relations
-        self.relations.each do |k,v|
-          send(:define_method, "sorted_#{v.name}") { sorted_relation v } if [:references_many, :references_and_referenced_in_many].include? v.macro
-        end
-      end
     end
 
     def freeze_relation_ids
@@ -22,6 +13,7 @@ module Mongoid
       self.relations.each do |k,v|
         if [:references_many, :references_and_referenced_in_many].include? v.macro
           @cache_sorted_ids[v.key] = [self.send(v.key)].flatten.map{ |rid| rid.to_s }
+          self.class.send(:define_method, "sorted_#{v.name}") { sorted_relation v }
         end
       end
     end

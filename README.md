@@ -37,12 +37,8 @@ class Book
 
   has_many :chapters
   has_and_belongs_to_many :authors
-
-  init_sorted_relations
 end
 ```
-
-It's important to place the ```init_sorted_relations``` after the declaration of your relations.
 
 
 ### Getting the relations in the right order
