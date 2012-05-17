@@ -8,11 +8,9 @@ module Mongoid
 
     def freeze_relation_ids
       @cache_sorted_documents = {}
-      @cache_sorted_ids = {}
 
       self.relations.each do |k,v|
         if [:references_many, :references_and_referenced_in_many].include? v.macro
-          @cache_sorted_ids[v.key] = [self.send(v.key)].flatten.map{ |rid| rid.to_s }
           self.class.send(:define_method, "sorted_#{v.name}") { sorted_relation v }
         end
       end
@@ -20,7 +18,7 @@ module Mongoid
 
     def sorted_relation(relation)
       if not @cache_sorted_documents[relation.name]
-        documents = self.send(relation.name).sort_by { |x| @cache_sorted_ids[relation.key].index(x.id.to_s) }
+        documents = self.send(relation.name).sort_by { |x| self.send(relation.key).index(x.id) }
         @cache_sorted_documents[relation.name] = Mongoid::FakeCriteria.new(documents)
       end
 
