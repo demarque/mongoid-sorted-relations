@@ -9,6 +9,21 @@ describe Mongoid::SortedRelations do
       before { book.save and book.reload }
 
       the("book.sorted_authors.map(&:name)") { should eql ['Sun Tzu', 'Sun Wu', 'Lao Zi'] }
+
     end
   end
+
+  context "modifying a loaded model" do
+    let (:book) {Book.new(:title => 'The Art of War')}
+
+    it "enables sorting on a preloaded model" do
+      author1 = Author.create(:name => 'auth1')
+      author2 = Author.create(:name => 'auth2')
+      book.authors << author2
+      book.authors << author1
+      book.sorted_authors.map(&:name).should eql ['auth2', 'auth1']
+    end
+
+  end
+
 end
