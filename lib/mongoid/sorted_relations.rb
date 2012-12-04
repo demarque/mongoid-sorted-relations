@@ -11,7 +11,7 @@ module Mongoid
       @cache_sorted_ids = {}
 
       self.relations.each do |k,v|
-        if [:references_many, :references_and_referenced_in_many].include? v.macro
+        if [:has_many, :has_and_belongs_to_many].include? v.macro
           @cache_sorted_ids[v.key] = [self.send(v.key)].flatten.map{ |rid| rid.to_s }
           self.class.send(:define_method, "sorted_#{v.name}") { sorted_relation v }
         end
